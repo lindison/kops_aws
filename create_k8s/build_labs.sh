@@ -92,10 +92,11 @@ for i in $(cat names); do
     --node-size=$KOPS_NODE_SIZE \
     --master-size=$KOPS_MASTER_SIZE \
     --node-count=$KOPS_NODE_COUNT \
+    --state=$KOPS_STATE_STORE \
     --master-count=$KOPS_MASTER_COUNT \
     --name=$i.$KOPS_DNS_ZONE && \
-  kops update cluster $i.$KOPS_DNS_ZONE --yes && \
-  kops export kubecfg $i.$KOPS_DNS_ZONE
+  kops update cluster $i.$KOPS_DNS_ZONE --state=$KOPS_STATE_STORE --yes && \
+  kops export kubecfg $i.$KOPS_DNS_ZONE --state=$KOPS_STATE_STORE
   done
 
 echo "Generating Ansible Inventory"

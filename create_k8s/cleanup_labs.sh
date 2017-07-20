@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+KOPS_STATE_STORE=""
+KOPS_DNS_ZONE=""
+
 function help_menu () {
 cat << EOF
 Usage: ${0}
@@ -9,9 +12,11 @@ OPTIONS:
 
    -d|--dns-zone         Kops DNS zone
 
+   -s|--state-store      Kops state storage location
+
 
 EXAMPLES:
-   cleanup_labs.sh --dns-zone "gamename.me"
+   cleanup_labs.sh --dns-zone "gamename.me" --state-store "s3://gamename-kubernetes"
 
 EOF
 exit
@@ -29,6 +34,10 @@ case "${1}" in
   help_menu
   shift
   ;;
+  -s|--state-store)
+  KOPS_STATE_STORE="${2}"
+  shift
+  ;;
   *)
   echo "${1} is not a valid flag, try running: ${0} --help"
   ;;
@@ -37,8 +46,9 @@ shift
 done
 
 [ -z ${KOPS_DNS_ZONE} ] && echo "DNS Zone required!" && help_menu
+[ -z ${KOPS_STATE_STORE} ] && echo "Kops state store required!" && help_menu
 
 for i in $(cat names); do
-  kops delete cluster ${i}.${KOPS_DNS_ZONE} --yes;
+  kops delete cluster ${i}.${KOPS_DNS_ZONE} --state=$KOPS_STATE_STORE --yes;
 done
 
